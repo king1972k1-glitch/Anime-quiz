@@ -9,8 +9,8 @@
       background: linear-gradient(120deg,#260154,#4d0154 80%);
       color: #fff;
       font-family: 'Poppins', sans-serif;
-      padding: 18px 14px;
-      max-width: 680px;
+      padding: 22px 10px;
+      max-width: 560px;
       margin: auto;
       border-radius: 16px;
       box-shadow: 0 0 25px #ff4dc4;
@@ -22,43 +22,42 @@
       margin-bottom: 20px;
     }
     section {
-      margin-bottom: 30px;
+      margin-bottom: 26px;
       background: rgba(30,0,60,0.21);
-      padding: 18px 15px;
+      padding: 17px 12px;
       border-radius: 10px;
       box-shadow: inset 0 0 15px #a03aff8b;
     }
     label {
       font-weight: 600;
       color: #ffd1fb;
-      margin-top: 12px;
-      display: inline-block;
+      margin-bottom: 6px;
+      display: block;
+      font-size: 14px;
     }
-    input[type="text"], input[type="number"], textarea, select {
+    input[type="text"], textarea {
       background: rgba(255,255,255,0.15);
-      border:none;
-      border-radius: 6px;
-      padding: 10px 12px;
+      border-radius: 7px;
+      border: none;
+      width: 100%;
+      padding: 10px 13px;
       font-family: monospace, 'Poppins', sans-serif;
       font-size: 14px;
       color: #fff;
-      margin-top: 4px;
-      width: 100%;
-      box-sizing: border-box;
+      margin-bottom: 17px;
+      min-height: 110px;
       resize: vertical;
     }
-    textarea {
-      min-height: 130px;
-    }
+    textarea { min-height: 150px; }
     button {
-      margin-top: 12px;
+      margin-top: 9px;
       background: linear-gradient(90deg, #ff4dc4 45%, #a449ff 90%);
       border: none;
       border-radius: 12px;
       color: #fff;
       font-weight: 900;
       font-size: 16px;
-      padding: 12px;
+      padding: 11px;
       width: 100%;
       cursor: pointer;
       box-shadow: 0 0 18px #ff4dc4;
@@ -79,7 +78,7 @@
       font-size: 14px;
     }
     th, td {
-      padding: 9px 8px;
+      padding: 8px 6px;
       border: 1px solid #572a7e;
       text-align: center;
       color: #ffb1ff;
@@ -90,101 +89,62 @@
       font-weight: 700;
     }
     .btn-small {
-      padding: 6px 14px;
-      font-size: 13px;
+      padding: 6px 13px;
+      font-size: 12px;
+      margin-top:2px;
+      margin-bottom:2px;
       font-weight: 700;
-      border-radius: 8px;
+      border-radius: 7px;
       user-select: none;
+      background: #a449ff; color:#fff; border:none; cursor:pointer;
     }
-    .btn-block {
-      background: #ba002c;
-      color: #fff;
-      border:none;
-      cursor:pointer;
-    }
-    .btn-unblock {
-      background: #00b24e;
-      color: #fff;
-      border:none;
-      cursor:pointer;
-    }
-    .btn-edit {
-      background: #ffd100;
-      color: #3a157e;
-      border:none;
-      cursor:pointer;
-      margin-right: 6px;
-    }
-    .btn-delete {
-      background: #ff3f3f;
-      color: #fff;
-      border:none;
-      cursor:pointer;
-    }
-    #statusMsg {
-      margin-top: 15px;
-      font-weight: 700;
-      color: #ffb1ff;
-      text-align: center;
-      min-height: 22px;
-      user-select: none;
-      font-size: 15px;
-    }
+    .btn-edit { background: #ffd100; color: #3a157e; }
+    .btn-delete { background: #ff3f3f; color: #fff; }
+    #statusMsg { margin-bottom: 13px;font-weight:700;text-align:center;min-height:23px;user-select:none;font-size:14px}
+    .edit-area {background:rgba(255,255,255,0.13);color:#fff;border-radius:9px;padding:10px;}
+    .edit-area input[type="text"], .edit-area textarea {margin-bottom:7px;}
   </style>
 </head>
 <body>
   <h1>Anime Quiz Admin Panel</h1>
   <div id="statusMsg"></div>
 
-  <section id="usersSection">
-    <h2>Users Management</h2>
-    <table id="usersTable">
-      <thead>
-        <tr>
-          <th>UID</th>
-          <th>Name / Email</th>
-          <th>Level</th>
-          <th>XP</th>
-          <th>Blocked</th>
-          <th>Actions (Block / XP)</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <section>
+    <h2>Bulk Upload <span style="font-size:13px;color:#ffe175;">(overwrites quiz!)</span></h2>
+    <label for="categoryInput">Category Name</label>
+    <input id="categoryInput" type="text" placeholder="e.g. naruto" />
+
+    <label for="quizInput">Quiz ID (unique, e.g. naruto_quiz1)</label>
+    <input id="quizInput" type="text" placeholder="e.g. naruto_quiz1" />
+
+    <label for="jsonInput">Quiz Data JSON</label>
+    <textarea id="jsonInput" placeholder='{"name":"Naruto Quiz 1","questions":[{"q":"Who is Naruto&apos;s teacher?","options":["Kakashi","Iruka","Sasuke","Jiraiya"],"answer":"Kakashi"}]}'></textarea>
+
+    <button id="uploadBtn">Set/Overwrite Quiz</button>
   </section>
 
-  <section id="quizzesSection">
-    <h2>Quizzes Management</h2>
+  <section>
+    <h2>All Quizzes</h2>
     <table id="quizzesTable">
       <thead>
         <tr>
           <th>Category</th>
           <th>Quiz ID</th>
-          <th>Actions (Edit / Delete)</th>
+          <th>Name</th>
+          <th>Qns</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
-  </section>
-
-  <section>
-    <h2>Bulk Upload Quiz Questions</h2>
-    <label for="categoryInput">Category Name</label>
-    <input id="categoryInput" type="text" placeholder="e.g. naruto" />
-    <label for="quizInput">Quiz Name</label>
-    <input id="quizInput" type="text" placeholder="e.g. quiz1" />
-    <label for="jsonInput">Questions JSON Array</label>
-    <textarea id="jsonInput" placeholder='[{"q":"Question?","options":["A","B","C","D"],"answer":"A"}, ...]'></textarea>
-    <button id="uploadBtn">Upload Questions</button>
+    <div id="editArea" class="edit-area" style="display:none;"></div>
   </section>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
     import {
-      getFirestore, collection, doc, getDocs, onSnapshot, updateDoc,
-      deleteDoc, addDoc, writeBatch, getDoc
+      getFirestore, collection, doc, getDocs, setDoc, deleteDoc, getDoc, updateDoc
     } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCw5PitKPzzRBWdlZiI-Csm-N3av_9lIqQ",
@@ -197,212 +157,112 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const auth = getAuth(app);
 
-    const adminUID = "7lANMvk2qZUd5tirkIYhJSepKv63";
-
-    const statusMsg = document.getElementById("statusMsg");
-    const usersTableBody = document.querySelector("#usersTable tbody");
+    // Bulk upload/set
+    const categoryInput = document.getElementById('categoryInput');
+    const quizInput = document.getElementById('quizInput');
+    const jsonInput = document.getElementById('jsonInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const statusMsg = document.getElementById('statusMsg');
     const quizzesTableBody = document.querySelector("#quizzesTable tbody");
-    const categoryInput = document.getElementById("categoryInput");
-    const quizInput = document.getElementById("quizInput");
-    const jsonInput = document.getElementById("jsonInput");
-    const uploadBtn = document.getElementById("uploadBtn");
+    const editArea = document.getElementById('editArea');
 
     function showStatus(msg, error = false) {
       statusMsg.textContent = msg;
       statusMsg.style.color = error ? "tomato" : "limegreen";
-      setTimeout(() => (statusMsg.textContent = ""), 4000);
+      setTimeout(() => (statusMsg.textContent = ""), 3600);
     }
 
-    onAuthStateChanged(auth, (user) => {
-      if (!user || user.uid !== adminUID) {
-        alert("Access denied! Admin only.");
-        window.location.href = "index.html";
-        return;
-      }
-      // Load users and quizzes live
-      loadUsers();
-      loadQuizzes();
-    });
-
-    // Load users live with block/unblock and XP controls
-    function loadUsers() {
-      const usersRef = collection(db, "users");
-      onSnapshot(usersRef, (snapshot) => {
-        usersTableBody.innerHTML = "";
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${doc.id}</td>
-            <td>${data.displayName || ""} <br><small>${data.email || ""}</small></td>
-            <td>${data.level || 1}</td>
-            <td>${data.xp || 0}</td>
-            <td>${data.blocked ? "Yes" : "No"}</td>
-            <td>
-              <button class="btn-small btn-block">${data.blocked ? "Unblock" : "Block"}</button>
-              <input type="number" class="xpInput" placeholder="XP +" style="width:60px; margin-left:8px" />
-              <button class="btn-small btn-edit">Add XP</button>
-              <button class="btn-small btn-edit" style="margin-left:6px;">Sub XP</button>
-            </td>
-          `;
-          // Buttons Functionality
-          const blockBtn = tr.querySelector(".btn-block");
-          const addXPBtn = tr.querySelectorAll(".btn-edit")[0];
-          const subXPBtn = tr.querySelectorAll(".btn-edit")[1];
-          const xpInput = tr.querySelector(".xpInput");
-
-          blockBtn.onclick = async () => {
-            try {
-              await updateDoc(doc(db, "users", doc.id), {
-                blocked: !data.blocked,
-              });
-              showStatus(`User ${!data.blocked ? "blocked" : "unblocked"}!`);
-            } catch {
-              showStatus("Failed to update block", true);
-            }
-          };
-          addXPBtn.onclick = async () => {
-            const xpToAdd = parseInt(xpInput.value);
-            if (isNaN(xpToAdd) || xpToAdd <= 0) return alert("Enter valid XP");
-            try {
-              const userRef = doc(db, "users", doc.id);
-              const userSnap = await getDoc(userRef);
-              const currentXP = userSnap.data()?.xp || 0;
-              await updateDoc(userRef, { xp: currentXP + xpToAdd });
-              showStatus(`Added ${xpToAdd} XP to ${data.displayName || doc.id}`);
-              xpInput.value = "";
-            } catch {
-              showStatus("Failed to add XP", true);
-            }
-          };
-          subXPBtn.onclick = async () => {
-            const xpToSub = parseInt(xpInput.value);
-            if (isNaN(xpToSub) || xpToSub <= 0) return alert("Enter valid XP");
-            try {
-              const userRef = doc(db, "users", doc.id);
-              const userSnap = await getDoc(userRef);
-              const currentXP = userSnap.data()?.xp || 0;
-              await updateDoc(userRef, { xp: Math.max(0, currentXP - xpToSub) });
-              showStatus(`Subtracted ${xpToSub} XP from ${data.displayName || doc.id}`);
-              xpInput.value = "";
-            } catch {
-              showStatus("Failed to subtract XP", true);
-            }
-          };
-          usersTableBody.appendChild(tr);
-        });
-      });
-    }
-
-    // Load quizzes with edit and delete options
-    function loadQuizzes() {
-      const quizzesRef = collection(db, "quizzes");
-      onSnapshot(quizzesRef, async (snapshot) => {
-        quizzesTableBody.innerHTML = "";
-        for (const doc of snapshot.docs) {
-          const category = doc.id;
-          const subQuizzesRef = collection(db, "quizzes", category, "subQuizzes");
-          const subSnap = await getDocs(subQuizzesRef);
-          subSnap.forEach((qdoc) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td>${category}</td>
-              <td>${qdoc.id}</td>
-              <td>
-                <button class="btn-small btn-edit">Edit</button>
-                <button class="btn-small btn-delete">Delete</button>
-              </td>
-            `;
-            // Edit button opens prompt to change quiz name
-            const editBtn = tr.querySelector(".btn-edit");
-            const deleteBtn = tr.querySelector(".btn-delete");
-
-            editBtn.onclick = async () => {
-              const newName = prompt("Enter new quiz name", qdoc.id);
-              if (newName && newName !== qdoc.id) {
-                // Create new quiz doc, move questions and delete old quiz (complex)
-                alert(
-                  "Rename quiz functionality coming soon; currently not supported."
-                );
-              }
-            };
-            deleteBtn.onclick = async () => {
-              if (!confirm(`Delete quiz '${qdoc.id}' in category '${category}'? This cannot be undone.`))
-                return;
-              try {
-                // Delete all questions then quiz
-                const questionsRef = collection(
-                  db,
-                  "quizzes",
-                  category,
-                  "subQuizzes",
-                  qdoc.id,
-                  "questions"
-                );
-                const questionsSnap = await getDocs(questionsRef);
-                const batch = writeBatch(db);
-                questionsSnap.forEach((qdoc) => batch.delete(qdoc.ref));
-                await batch.commit();
-                await deleteDoc(
-                  doc(db, "quizzes", category, "subQuizzes", qdoc.id)
-                );
-                showStatus(`Deleted quiz '${qdoc.id}'`);
-              } catch {
-                showStatus("Quiz deletion failed", true);
-              }
-            };
-            quizzesTableBody.appendChild(tr);
-          });
-        }
-      });
-    }
-
-    // Bulk question upload
     uploadBtn.onclick = async () => {
-      const category = categoryInput.value.trim();
-      const quiz = quizInput.value.trim();
+      const category = categoryInput.value.trim().toLowerCase();
+      const quizId = quizInput.value.trim();
       const json = jsonInput.value.trim();
-      if (!category) return showStatus("Please enter category", true);
-      if (!quiz) return showStatus("Please enter quiz name", true);
-      if (!json) return showStatus("Please paste JSON", true);
-      let questions;
+      if (!category) return showStatus("Enter category", true);
+      if (!quizId) return showStatus("Enter quiz ID", true);
+      if (!json) return showStatus("Paste quiz data JSON", true);
+      let data;
       try {
-        questions = JSON.parse(json);
+        data = JSON.parse(json);
       } catch {
         return showStatus("Invalid JSON format", true);
       }
-      if (!Array.isArray(questions))
-        return showStatus("JSON must be an array of questions", true);
-      uploadBtn.disabled = true;
-      let added = 0;
-      showStatus("Uploading questions...");
-      for (let q of questions) {
-        if (
-          q.q &&
-          Array.isArray(q.options) &&
-          q.options.length === 4 &&
-          q.answer &&
-          q.options.includes(q.answer)
-        ) {
-          try {
-            await addDoc(
-              collection(db, "quizzes", category, "subQuizzes", quiz, "questions"),
-              q
-            );
-            added++;
-          } catch {}
-        }
+      if (!data || !Array.isArray(data.questions)) {
+        return showStatus("JSON must have a questions array!", true);
       }
-      uploadBtn.disabled = false;
-      if (added > 0) {
-        showStatus(`Added ${added} questions to ${category}/${quiz}`);
+      try {
+        await setDoc(doc(db, "quizzes", category, quizId), data);
+        showStatus("Quiz set/updated!");
         jsonInput.value = "";
-      } else {
-        showStatus("No valid questions found", true);
+        loadQuizzes();
+      } catch {
+        showStatus("Failed to save quiz", true);
       }
     };
+
+    async function loadQuizzes() {
+      quizzesTableBody.innerHTML = "";
+      const quizCatsSnap = await getDocs(collection(db,"quizzes"));
+      for (const catDoc of quizCatsSnap.docs) {
+        const cat = catDoc.id;
+        const quizzesSnap = await getDocs(collection(db,"quizzes",cat));
+        quizzesSnap.forEach(qdoc => {
+          const qdata = qdoc.data();
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${cat}</td>
+            <td>${qdoc.id}</td>
+            <td>${qdata.name || ''}</td>
+            <td>${Array.isArray(qdata.questions) ? qdata.questions.length : 0}</td>
+            <td>
+              <button class="btn-small btn-edit">Edit</button>
+              <button class="btn-small btn-delete">Delete</button>
+            </td>
+          `;
+          // Actions
+          const editBtn = tr.querySelector('.btn-edit');
+          const deleteBtn = tr.querySelector('.btn-delete');
+          editBtn.onclick = () => openEdit(cat, qdoc.id, qdata);
+          deleteBtn.onclick = async () => {
+            if (confirm(`Delete quiz ${qdoc.id} in ${cat}? This cannot be undone.`)) {
+              await deleteDoc(doc(db,"quizzes",cat,qdoc.id));
+              showStatus("Quiz deleted");
+              loadQuizzes();
+            }
+          };
+          quizzesTableBody.appendChild(tr);
+        });
+      }
+    }
+
+    // Edit quiz data inline
+    function openEdit(category, quizId, qdata) {
+      editArea.style.display = "block";
+      editArea.innerHTML = `
+        <strong>Edit Quiz: ${quizId} (${category})</strong><br>
+        <label>Quiz Name</label>
+        <input type="text" id="editQuizName" value="${qdata.name || ''}"/><br>
+        <label>Questions JSON</label>
+        <textarea id="editQuizQuestions">${JSON.stringify(qdata.questions || [], null, 2)}</textarea><br>
+        <button id="saveEditBtn">Save Changes</button>
+        <button onclick="this.parentNode.style.display='none'">Cancel</button>
+      `;
+      document.getElementById('saveEditBtn').onclick = async () => {
+        const name = document.getElementById('editQuizName').value.trim();
+        let questions;
+        try { questions = JSON.parse(document.getElementById('editQuizQuestions').value); }
+        catch { showStatus("Invalid questions JSON", true); return; }
+        if (!Array.isArray(questions)) { showStatus("Questions must be an array", true); return; }
+        await setDoc(doc(db,"quizzes",category,quizId), {name, questions});
+        editArea.style.display = "none";
+        showStatus("Quiz updated!");
+        loadQuizzes();
+      };
+    }
+    window.openEdit = openEdit;
+
+    // Load quizzes on page open
+    loadQuizzes();
   </script>
 </body>
-</html>
+  </html>
+    
