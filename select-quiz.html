@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>Select Quiz</title>
+  <title>Select Quiz - Anime Quiz</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
     body { background: linear-gradient(120deg,#260154,#241447 85%); color: #fff; font-family: 'Poppins',sans-serif; margin:0;}
@@ -57,17 +57,19 @@
         return;
       }
       try {
-        const subQuizSnap = await getDocs(collection(db, "quizzes", category, "subQuizzes"));
-        if (subQuizSnap.empty) {
+        // For new structure, quizzes/{category}/{quizName}
+        const quizSnap = await getDocs(collection(db, "quizzes", category));
+        if (quizSnap.empty) {
           statusMsg.textContent = `No quizzes found for "${category}".`;
           return;
         }
-        subQuizSnap.forEach(doc => {
+        quizSnap.forEach(doc => {
           const quizName = doc.id;
+          const quizMeta = doc.data();
           const quizCard = document.createElement("div");
           quizCard.className = "quiz-card";
           quizCard.innerHTML = `
-            <div class="quiz-title">${quizName}</div>
+            <div class="quiz-title">${quizMeta.name || quizName}</div>
             <button class="quiz-btn" onclick="startQuiz('${quizName}')">Play Quiz</button>
           `;
           quizListEl.appendChild(quizCard);
@@ -78,7 +80,6 @@
     }
     // Secure page: define startQuiz globally
     window.startQuiz = function(quizName) {
-      // Lowercase for consistency on path parameters
       window.location.href = `play-quiz.html?cat=${encodeURIComponent(category)}&quiz=${encodeURIComponent(quizName)}`;
     };
 
