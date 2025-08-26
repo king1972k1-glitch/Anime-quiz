@@ -1,0 +1,19 @@
+<!-- Updated Edit Profile Modal -->
+<div id="profileModal" style="display:none;position:fixed;top:16%;left:50%;transform:translateX(-50%);background:#301545;color:white;padding:20px;border-radius:12px;box-shadow:0 0 23px #ff4dc4;max-width:370px;width:92vw;z-index:998;">
+  <h2>Edit Profile</h2>
+  <div style="margin-bottom:14px;">
+    <span id="profileBadge" style="font-size:33px;vertical-align:middle;"></span>
+    <span id="badgeLabel" style="font-weight:700;font-size:17px;margin-left:10px;"></span>
+  </div>
+  <div style="margin-bottom:14px;">
+    <span style="color:#ff77ff;font-weight:600;">Level:</span> <span id="profileLevel"></span>
+    &nbsp;|&nbsp;
+    <span style="color:#ffe175;font-weight:600;">XP:</span> <span id="profileXP"></span>
+  </div>
+  <label for="profileName">Name</label>
+  <input type="text" id="profileName"/>
+  <label for="profileEmail">Email</label>
+  <input type="text" id="profileEmail" disabled/>
+  <button id="saveProfile">Save</button>
+  <button id="closeProfile">Close</button>
+</div>

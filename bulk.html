@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Anime Quiz Admin - Bulk Add Questions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      background: linear-gradient(120deg,#260154,#4d0154 80%);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      padding: 20px;
+      max-width: 480px;
+      margin: auto;
+      border-radius: 16px;
+      box-shadow: 0 0 22px #ff4dc4;
+    }
+    h1 {
+      font-family: 'Ninja Naruto', cursive;
+      color: #ff4dc4;
+      text-align: center;
+      margin-bottom: 26px;
+    }
+    label {
+      font-weight: 600;
+      color: #ffd1fb;
+      display: block;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: monospace, 'Poppins', sans-serif;
+      font-size: 14px;
+      color: #fff;
+      resize: vertical;
+      min-height: 150px;
+      margin-top: 6px;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #ff4dc4 45%, #a449ff 95%);
+      border: none;
+      border-radius: 10px;
+      font-weight: 900;
+      font-size: 16px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 18px #ff4dc4;
+      user-select: none;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #a449ff 45%, #ff4dc4 95%);
+    }
+    #statusMsg {
+      margin-top: 20px;
+      font-weight: 700;
+      font-size: 15px;
+      text-align: center;
+      min-height: 22px;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Bulk Upload Quiz Questions</h1>
+
+  <label for="categoryInput">Category Name (Anime)</label>
+  <input type="text" id="categoryInput" placeholder="Enter category e.g. naruto" />
+
+  <label for="quizInput">Quiz Name</label>
+  <input type="text" id="quizInput" placeholder="Enter quiz name e.g. quiz1" />
+
+  <label for="jsonInput">Paste Questions JSON Array</label>
+  <textarea id="jsonInput" placeholder='[{"q":"Question text?","options":["A","B","C","D"],"answer":"B"}, {...}]'></textarea>
+
+  <button id="uploadBtn">Upload Questions</button>
+
+  <div id="statusMsg"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCw5PitKPzzRBWdlZiI-Csm-N3av_9lIqQ",
+      authDomain: "anime001-d6669.firebaseapp.com",
+      projectId: "anime001-d6669",
+      storageBucket: "anime001-d6669.appspot.com",
+      messagingSenderId: "1005431495919",
+      appId: "1:1005431495919:web:dfbf43ba8a2a8ae5db4f1a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const categoryInput = document.getElementById('categoryInput');
+    const quizInput = document.getElementById('quizInput');
+    const jsonInput = document.getElementById('jsonInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const statusMsg = document.getElementById('statusMsg');
+
+    uploadBtn.addEventListener('click', async () => {
+      const category = categoryInput.value.trim();
+      const quiz = quizInput.value.trim();
+      const jsonText = jsonInput.value.trim();
+
+      statusMsg.style.color = 'orange';
+
+      if (!category) {
+        statusMsg.textContent = 'Please enter a category.';
+        return;
+      }
+      if (!quiz) {
+        statusMsg.textContent = 'Please enter a quiz name.';
+        return;
+      }
+      if (!jsonText) {
+        statusMsg.textContent = 'Please paste questions JSON.';
+        return;
+      }
+
+      let questions;
+      try {
+        questions = JSON.parse(jsonText);
+      } catch (e) {
+        statusMsg.textContent = 'Invalid JSON format.';
+        return;
+      }
+
+      if (!Array.isArray(questions)) {
+        statusMsg.textContent = 'JSON must be an array of questions.';
+        return;
+      }
+
+      let addedCount = 0;
+      uploadBtn.disabled = true;
+      statusMsg.textContent = 'Uploading questions...';
+
+      for (const q of questions) {
+        // Basic validation of question structure
+        if (
+          q.q && typeof q.q === 'string' &&
+          Array.isArray(q.options) && q.options.length === 4 &&
+          q.answer && q.options.includes(q.answer)
+        ) {
+          try {
+            await addDoc(collection(db, 'quizzes', category, 'subQuizzes', quiz, 'questions'), q);
+            addedCount++;
+          } catch (err) {
+            console.error('Error adding doc:', err);
+          }
+        }
+      }
+
+      uploadBtn.disabled = false;
+      if (addedCount) {
+        statusMsg.style.color = 'limegreen';
+        statusMsg.textContent = `Successfully added ${addedCount} question${addedCount > 1 ? 's' : ''} to "${category}/${quiz}".`;
+        jsonInput.value = '';
+      } else {
+        statusMsg.style.color = 'tomato';
+        statusMsg.textContent = 'No valid questions found or uploaded.';
+      }
+    });
+  </script>
+</body>
+</html>

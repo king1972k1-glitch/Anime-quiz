@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Anime Quiz Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    body { background: linear-gradient(120deg,#260154,#241447 80%); color: #fff; font-family: 'Poppins', sans-serif; margin:0;}
+    .topbar { display: flex; align-items: center; padding:10px 12px; }
+    #userIcon { width:40px; height:40px; border-radius:50%; border:2px solid #ff4dc4; margin-right:10px; cursor:pointer;}
+    .topbar span { font-weight:600; margin-right:12px; }
+    .header-buttons { margin-left:auto; }
+    .header-buttons button { background:#ff4dc4; color:#fff; border:none; border-radius:9px; margin-left:7px; padding:9px 18px; font-weight:600; font-size:14px; cursor:pointer; }
+    .dashboard { margin-top: 13px; padding: 0 7px; }
+    .level-xp { margin:14px 0; font-size:17px; }
+    .category-card { background:rgba(30,0,60,0.17); border-radius:16px; border:2.5px solid #ff4dc4; margin-bottom:19px; padding:18px 0; text-align:center; }
+    .category-card label { font-size:17px; font-weight:600; color:#ff77ff; letter-spacing:1px; margin-bottom:4px; display:block;}
+    .category-card button { background:none; border:none; color:#ff4dc4; font-size:21px; font-family:'Ninja Naruto',cursive; cursor:pointer;}
+    .footer { text-align:center; font-size:15px; margin-top:18px; color:#ffb1ed;}
+    #profileModal { display:none; position:fixed; top:10%; left:50%; transform:translateX(-50%); background:#301545; color:white; padding:20px; border-radius:12px; box-shadow:0 0 23px #ff4dc4; max-width:390px; width:96vw; z-index:998;}
+    .profileBox {margin-bottom:14px;}
+    .profileBox span { font-size:33px; vertical-align:middle;}
+    .profileBox label { font-size:17px; font-weight:700; margin-left:10px;}
+    .modal-row {margin-bottom:11px;}
+    #badgeGallery {margin-top:8px; display:flex; flex-wrap:wrap; gap:11px; max-height:75px; overflow-y:auto;}
+    .badgeIcon {text-align:center; min-width:45px;}
+    .badgeIcon span {font-size:27px;}
+    .badgeIcon .badgeLabel {font-size:11px;}
+    .badgeIcon.active {filter:drop-shadow(0 0 7px #ffe175);}
+    .badgeIcon .badgeLabel.active {color:#ffe175; font-weight:700;}
+    #saveProfile, #closeProfile {margin-top:13px;padding:8px;font-weight:700; border-radius:8px; cursor:pointer; border:none; width:49%; background:linear-gradient(90deg,#a449ff,#ff4dc4);color:#fff;}
+    #closeProfile {background:#820141;}
+    #profileModal input { width:100%;padding:7px;margin:5px 0; border-radius:8px; border:none; color:#fff; background:rgba(255,255,255,0.13);}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <img src="default-avatar.png" id="userIcon" alt="User" title="Your Profile"/>
+    <span id="userName">Loading...</span>
+    <div class="header-buttons">
+      <button id="logoutBtn">Logout</button>
+      <button id="adminBtn">Admin Panel</button>
+    </div>
+  </div>
+  <div class="dashboard">
+    <div class="level-xp">
+      ⚡ Level: <span id="userLevel">1</span> &nbsp; ⭐ XP: <span id="userXP">0</span>
+    </div>
+    <!-- No images in categories below -->
+    <div class="category-card">
+      <label>Naruto 🍥</label>
+      <button onclick="selectCategory('naruto')">Naruto</button>
+    </div>
+    <div class="category-card">
+      <label>One Piece ☠️</label>
+      <button onclick="selectCategory('onepiece')">One Piece</button>
+    </div>
+    <div class="category-card">
+      <label>Attack on Titan ⚔️</label>
+      <button onclick="selectCategory('aot')">Attack on Titan</button>
+    </div>
+    <div class="category-card">
+      <label>My Hero Academia 💥</label>
+      <button onclick="selectCategory('mha')">My Hero Academia</button>
+    </div>
+    <div class="footer">
+      🔥 Anime Quiz ~ Become the Ultimate Otaku
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div id="profileModal" role="dialog" aria-modal="true">
+    <h2>Edit Profile</h2>
+    <div class="profileBox">
+      <span id="profileBadge"></span>
+      <label id="badgeLabel"></label>
+    </div>
+    <div class="modal-row"><span style="color:#ff77ff;font-weight:600;">Level:</span> <span id="profileLevel"></span>
+      &nbsp;|&nbsp;
+      <span style="color:#ffe175;font-weight:600;">XP:</span> <span id="profileXP"></span>
+    </div>
+    <label for="profileName">Name</label>
+    <input type="text" id="profileName"/>
+    <label for="profileEmail">Email</label>
+    <input type="text" id="profileEmail" disabled/>
+    <div style="margin-top:14px;">
+      <span style="font-weight:600; color:#ffb1ed;">Badge Collection:</span>
+      <div id="badgeGallery"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;">
+      <button id="saveProfile">Save</button>
+      <button id="closeProfile">Close</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCw5PitKPzzRBWdlZiI-Csm-N3av_9lIqQ",
+      authDomain: "anime001-d6669.firebaseapp.com",
+      projectId: "anime001-d6669",
+      storageBucket: "anime001-d6669.appspot.com",
+      messagingSenderId: "1005431495919",
+      appId: "1:1005431495919:web:dfbf43ba8a2a8ae5db4f1a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // BADGE LADDER (20 levels, Hokage/Pirate King top)
+    const BADGES = [
+      {icon:"🏫",  label:"Academy Student"},
+      {icon:"🌱",  label:"Genin"},
+      {icon:"🥈",  label:"Chunin"},
+      {icon:"🚥",  label:"Tokubetsu Jonin"},
+      {icon:"🥇",  label:"Jonin"},
+      {icon:"🦾",  label:"ANBU Member"},
+      {icon:"🛡️",  label:"Sannin"},
+      {icon:"🏆",  label:"Kage Candidate"},
+      {icon:"🎖️",  label:"Kage"},
+      {icon:"🏴‍☠️",  label:"Pirate Apprentice"},
+      {icon:"🚢",  label:"Cabin Boy"},
+      {icon:"🗺️",  label:"Navigator"},
+      {icon:"⚔️",  label:"Swordsman"},
+      {icon:"🦜",  label:"First Mate"},
+      {icon:"👒",  label:"Captain"},
+      {icon:"🦑",  label:"Shichibukai"},
+      {icon:"🌊",  label:"Yonko"},
+      {icon:"🌀",  label:"S-Class Mage"},
+      {icon:"💥",  label:"SS-Rank Hero"},
+      {icon:"👑",  label:"Hokage / Pirate King"}
+    ];
+
+    // Elements
+    const userIcon = document.getElementById('userIcon');
+    const userName = document.getElementById('userName');
+    const userLevel = document.getElementById('userLevel');
+    const userXP = document.getElementById('userXP');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const adminBtn = document.getElementById('adminBtn');
+    const profileModal = document.getElementById('profileModal');
+    const profileBadge = document.getElementById('profileBadge');
+    const badgeLabel = document.getElementById('badgeLabel');
+    const profileLevel = document.getElementById('profileLevel');
+    const profileXP = document.getElementById('profileXP');
+    const profileNameInput = document.getElementById('profileName');
+    const profileEmailInput = document.getElementById('profileEmail');
+    const saveProfileBtn = document.getElementById('saveProfile');
+    const closeProfileBtn = document.getElementById('closeProfile');
+    const badgeGallery = document.getElementById('badgeGallery');
+
+    let currentUser = null;
+    let userDoc = null;
+
+    onAuthStateChanged(auth, async user => {
+      if (!user) return window.location.href = 'index.html';
+      currentUser = user;
+      userName.textContent = user.displayName || 'Otaku';
+      profileEmailInput.value = user.email;
+      await loadUserData(user.uid);
+    });
+
+    async function loadUserData(uid) {
+      try {
+        const snap = await getDoc(doc(db, 'users', uid));
+        if (snap.exists()) {
+          userDoc = snap.data();
+          userLevel.textContent = userDoc.level || 1;
+          userXP.textContent = userDoc.xp || 0;
+        } else {
+          userDoc = {level:1, xp:0};
+          userLevel.textContent = 1;
+          userXP.textContent = 0;
+        }
+      } catch { userDoc = {level:1, xp:0}; userLevel.textContent = 1; userXP.textContent = 0; }
+    }
+
+    // Profile popup logic
+    userIcon.onclick = () => {
+      if (!currentUser) return;
+      showProfileModal({
+        displayName: currentUser.displayName,
+        email: currentUser.email,
+        level: userDoc.level || 1,
+        xp: userDoc.xp || 0
+      });
+    };
+
+    function showProfileModal(userObj) {
+      profileNameInput.value = userObj.displayName || '';
+      profileEmailInput.value = userObj.email || '';
+      profileLevel.textContent = userObj.level || 1;
+      profileXP.textContent = userObj.xp || 0;
+      // current badge
+      const idx = (userObj.level >= BADGES.length ? BADGES.length-1 : userObj.level-1) || 0;
+      const badge = BADGES[idx];
+      profileBadge.textContent = badge.icon;
+      badgeLabel.textContent = badge.label;
+      // BADGE GALLERY
+      badgeGallery.innerHTML = '';
+      BADGES.forEach((b, i) => {
+        const div = document.createElement('div');
+        div.className = 'badgeIcon' + (i === idx ? ' active' : '');
+        div.innerHTML = `<span>${b.icon}</span><br><span class="badgeLabel${i === idx ? ' active' : ''}">${b.label}</span>`;
+        badgeGallery.appendChild(div);
+      });
+      profileModal.style.display = 'block';
+    }
+
+    saveProfileBtn.onclick = async () => {
+      const newName = profileNameInput.value.trim();
+      if (!newName) return alert('Name cannot be empty!');
+      await setDoc(doc(db, 'users', currentUser.uid), { displayName: newName }, { merge: true });
+      await updateProfile(currentUser, { displayName: newName });
+      userName.textContent = newName;
+      profileModal.style.display = 'none';
+    };
+    closeProfileBtn.onclick = () => profileModal.style.display = 'none';
+
+    logoutBtn.onclick = () => { signOut(auth).then(()=>window.location.href='index.html'); };
+    adminBtn.onclick = () => { window.location.href = 'admin.html'; };
+
+    // Select category
+    window.selectCategory = function(cat) {
+      window.location.href = `select-quiz.html?cat=${encodeURIComponent(cat)}`;
+    };
+  </script>
+</body>
+</html>

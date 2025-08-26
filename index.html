@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Anime Quiz - Login</title>
+  <!-- Anime Style + Glow Theme -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCw5PitKPzzRBWdlZiI-Csm-N3av_9lIqQ",
+      authDomain: "anime001-d6669.firebaseapp.com",
+      projectId: "anime001-d6669",
+      storageBucket: "anime001-d6669.firebasestorage.app",
+      messagingSenderId: "1005431495919",
+      appId: "1:1005431495919:web:dfbf43ba8a2a8ae5db4f1a",
+      measurementId: "G-370KFDKT4D"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // Google Login
+    window.googleLogin = function () {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          localStorage.setItem("user", JSON.stringify(result.user));
+          window.location.href = "dashboard.html";
+        })
+        .catch((error) => alert("Login Failed: " + error.message));
+    };
+
+    // Redirect if already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+        window.location.href = "dashboard.html";
+      }
+    });
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Ninja+Naruto&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Press Start 2P', cursive;
+      background: url('assets/anime-bg.jpg') no-repeat center/cover;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+    }
+    .container {
+      position: relative;
+      z-index: 2;
+      background: rgba(20, 20, 40, 0.85);
+      border: 3px solid #ff4dc4;
+      border-radius: 16px;
+      padding: 40px 30px;
+      text-align: center;
+      width: 380px;
+      box-shadow: 0 0 25px #ff4dc4, 0 0 50px #5d00ff inset;
+      animation: floaty 3s ease-in-out infinite;
+    }
+    .container h1 {
+      font-family: 'Ninja Naruto', sans-serif;
+      font-size: 2rem;
+      color: #ff4dc4;
+      text-shadow: 0 0 8px #ff4dc4, 0 0 20px #5d00ff;
+      margin-bottom: 15px;
+    }
+    .container p {
+      font-size: 12px;
+      color: #ffc6ff;
+      margin-bottom: 25px;
+    }
+    button {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #ff4dc4, #5d00ff);
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'Press Start 2P', cursive;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 15px #ff4dc4;
+      transition: 0.3s;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #ff4dc4, 0 0 40px #5d00ff;
+    }
+
+    /* Floating glowing particles */
+    .particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ff4dc4;
+      animation: float 6s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      50% { transform: translateY(-80px) scale(1.3); opacity: 0.5; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    @keyframes floaty {
+      0%,100% { transform: translateY(0px); }
+      50% { transform: translateY(-7px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="container">
+    <h1>🔥 Anime Quiz</h1>
+    <p>Test your Skills 🌸 | Prove you’re an Otaku ⚡</p>
+    <button onclick="googleLogin()">Login with Google 🚀</button>
+  </div>
+
+  <!-- Glowing floating particles -->
+  <div class="particle" style="left:20%; top:70%;"></div>
+  <div class="particle" style="left:40%; top:85%; animation-delay:2s;"></div>
+  <div class="particle" style="left:60%; top:80%; animation-delay:4s;"></div>
+  <div class="particle" style="left:75%; top:65%; animation-delay:1s;"></div>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Play Anime Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { background: linear-gradient(120deg,#29002e,#240b4a 80%); color: #fff; font-family: 'Poppins', sans-serif; margin:0;}
+    .container { max-width:420px; margin:28px auto 0 auto; background:rgba(40,0,60,0.17); border-radius:16px; box-shadow:0 0 12px #ff4dc4; padding:23px 13px; }
+    h2 { font-size: 23px; color: #ff4dc4; text-align:center; font-family:'Ninja Naruto',cursive; margin-bottom:22px;}
+    .quiz-q { margin: 38px 0 18px 0; font-weight:600; font-size: 18px;}
+    .quiz-opt { display:block; margin-bottom:13px; background:#2d1840; border:none; border-radius:8px; color:#ffb1ed; padding:12px 17px; font-size:17px; cursor:pointer; transition:background .3s;}
+    .quiz-opt:hover:enabled { background: #ff66d8; color: #390731;}
+    .quiz-opt[disabled] {opacity:0.55; cursor:not-allowed;}
+    #result { font-size:18px; font-weight:bold; color:#ff77ff; margin-top:9px;}
+    #nextBtn { margin-top:28px; padding:12px 0; color:#fff; background:linear-gradient(90deg,#ff4dc4,#a449ff); border:none; border-radius:11px; font-weight:700; font-size:18px; width:100%; box-shadow:0 0 9px #ff4dc4; cursor:pointer;}
+    #nextBtn:disabled { filter: grayscale(1);}
+    .score-summary { text-align:center; margin:23px 0; font-size:19px; color:#ffe7fb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="quizTitle">Loading quiz...</h2>
+    <div id="quizArea"></div>
+    <div id="result"></div>
+    <button id="nextBtn" style="display:none;">Next</button>
+  </div>
+
+  <!-- Goosebumps Sound Effects -->
+  <audio id="soundPerfect" src="anime-victory.mp3"></audio>
+  <audio id="soundGood" src="anime-epic.mp3"></audio>
+  <audio id="soundFail" src="anime-fail.mp3"></audio>
+  <audio id="soundShock" src="anime-shock.mp3"></audio>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCw5PitKPzzRBWdlZiI-Csm-N3av_9lIqQ",
+      authDomain: "anime001-d6669.firebaseapp.com",
+      projectId: "anime001-d6669",
+      storageBucket: "anime001-d6669.appspot.com",
+      messagingSenderId: "1005431495919",
+      appId: "1:1005431495919:web:dfbf43ba8a2a8ae5db4f1a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    function getParam(key) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(key);
+    }
+    const category = getParam('cat');
+    const quizName = getParam('quiz');
+    document.getElementById('quizTitle').textContent = (quizName?quizName:'Quiz') + " - " + (category?category.charAt(0).toUpperCase()+category.slice(1):'');
+
+    let questions = [], current = 0, score = 0;
+
+    async function loadQuestions() {
+      const snap = await getDocs(collection(db,"quizzes",category,"subQuizzes",quizName,"questions"));
+      questions = [];
+      snap.forEach(doc => questions.push(doc.data()));
+      startQuiz();
+    }
+
+    function startQuiz() {
+      if (questions.length === 0) {
+        document.getElementById('quizArea').innerHTML = '<b>No questions found!</b>';
+        return;
+      }
+      current = 0; score = 0;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const qa = document.getElementById('quizArea');
+      document.getElementById('result').textContent = '';
+      document.getElementById('nextBtn').style.display = 'none';
+      const q = questions[current];
+      qa.innerHTML = `
+        <div class="quiz-q">Q${current+1}: ${q.q}</div>
+        ${q.options.map(opt=>`<button type="button" class="quiz-opt" onclick="window.selectAns('${opt.replace(/'/g,"\\'")}')">${opt}</button>`).join("")}
+      `;
+    }
+
+    window.selectAns = function(opt) {
+      const correct = questions[current].answer;
+      const resultEl = document.getElementById('result');
+      document.querySelectorAll('.quiz-opt').forEach(b => b.disabled=true);
+      if (opt==correct) {
+        resultEl.textContent = "Correct!";
+        score++;
+      } else {
+        resultEl.textContent = `Wrong! Correct: ${correct}`;
+      }
+      document.getElementById('nextBtn').style.display = 'block';
+    };
+
+    document.getElementById('nextBtn').onclick = function() {
+      current++;
+      if (current < questions.length) {
+        showQuestion();
+      } else {
+        endQuiz();
+      }
+      document.getElementById('result').textContent = '';
+    };
+
+    function playGoosebumpsSound(score, total) {
+      if (score === total) {
+        document.getElementById('soundPerfect').play();
+      } else if (score >= Math.floor(total * 0.7)) {
+        document.getElementById('soundGood').play();
+      } else if (score < Math.floor(total * 0.4)) {
+        document.getElementById('soundFail').play();
+      } else {
+        document.getElementById('soundShock').play();
+      }
+    }
+
+    function endQuiz() {
+      document.getElementById('quizArea').innerHTML = `<div class="score-summary">Quiz Completed!<br>Your Score: ${score} / ${questions.length}</div>`;
+      document.getElementById('nextBtn').style.display = 'none';
+      playGoosebumpsSound(score, questions.length);
+    }
+
+    loadQuestions();
+  </script>
+</body>
+</html>
