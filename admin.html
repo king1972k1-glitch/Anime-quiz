@@ -1,268 +1,161 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- admin.html - EduTech Admin Panel with Quiz Edit/Delete --><!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Anime Quiz Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body {
-      background: linear-gradient(120deg,#260154,#4d0154 80%);
-      color: #fff;
-      font-family: 'Poppins', sans-serif;
-      padding: 22px 10px;
-      max-width: 560px;
-      margin: auto;
-      border-radius: 16px;
-      box-shadow: 0 0 25px #ff4dc4;
-    }
-    h1 {
-      font-family: 'Ninja Naruto', cursive;
-      color: #ff4dc4;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    section {
-      margin-bottom: 26px;
-      background: rgba(30,0,60,0.21);
-      padding: 17px 12px;
-      border-radius: 10px;
-      box-shadow: inset 0 0 15px #a03aff8b;
-    }
-    label {
-      font-weight: 600;
-      color: #ffd1fb;
-      margin-bottom: 6px;
-      display: block;
-      font-size: 14px;
-    }
-    input[type="text"], textarea {
-      background: rgba(255,255,255,0.15);
-      border-radius: 7px;
-      border: none;
-      width: 100%;
-      padding: 10px 13px;
-      font-family: monospace, 'Poppins', sans-serif;
-      font-size: 14px;
-      color: #fff;
-      margin-bottom: 17px;
-      min-height: 110px;
-      resize: vertical;
-    }
-    textarea { min-height: 150px; }
-    button {
-      margin-top: 9px;
-      background: linear-gradient(90deg, #ff4dc4 45%, #a449ff 90%);
-      border: none;
-      border-radius: 12px;
-      color: #fff;
-      font-weight: 900;
-      font-size: 16px;
-      padding: 11px;
-      width: 100%;
-      cursor: pointer;
-      box-shadow: 0 0 18px #ff4dc4;
-      user-select: none;
-      transition: background 0.3s ease;
-    }
-    button:disabled {
-      filter: grayscale(0.6);
-      cursor: default;
-    }
-    button:hover:not(:disabled) {
-      background: linear-gradient(90deg, #a449ff 50%, #ff4dc4 90%);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-      font-size: 14px;
-    }
-    th, td {
-      padding: 8px 6px;
-      border: 1px solid #572a7e;
-      text-align: center;
-      color: #ffb1ff;
-      vertical-align: middle;
-    }
-    th {
-      background: #540666;
-      font-weight: 700;
-    }
-    .btn-small {
-      padding: 6px 13px;
-      font-size: 12px;
-      margin-top:2px;
-      margin-bottom:2px;
-      font-weight: 700;
-      border-radius: 7px;
-      user-select: none;
-      background: #a449ff; color:#fff; border:none; cursor:pointer;
-    }
-    .btn-edit { background: #ffd100; color: #3a157e; }
-    .btn-delete { background: #ff3f3f; color: #fff; }
-    #statusMsg { margin-bottom: 13px;font-weight:700;text-align:center;min-height:23px;user-select:none;font-size:14px}
-    .edit-area {background:rgba(255,255,255,0.13);color:#fff;border-radius:9px;padding:10px;}
-    .edit-area input[type="text"], .edit-area textarea {margin-bottom:7px;}
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduTech | Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>Anime Quiz Admin Panel</h1>
-  <div id="statusMsg"></div>
+<body class="bg-gradient-to-br from-gray-900 to-blue-900 text-white min-h-screen p-6">
+  <h1 class="text-3xl font-bold mb-6 text-center">🛠️ Admin Panel</h1>  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Users List -->
+    <div class="bg-white text-black p-4 rounded-xl shadow-xl">
+      <h2 class="text-xl font-semibold mb-2">👥 All Users</h2>
+      <input id="search-user" type="text" placeholder="Search user..." class="p-2 border rounded w-full mb-2">
+      <ul id="user-list" class="space-y-2 max-h-96 overflow-y-auto"></ul>
+    </div><!-- Broadcast Message -->
+<div class="bg-white text-black p-4 rounded-xl shadow-xl">
+  <h2 class="text-xl font-semibold mb-2">📢 Broadcast Message</h2>
+  <textarea id="broadcast-msg" class="w-full p-2 border rounded mb-2" rows="4" placeholder="Enter your message to all users..."></textarea>
+  <button onclick="sendBroadcast()" class="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800">Send</button>
+</div>
+<a href="user-scores.html" class="bg-white text-blue-900 px-4 py-2 rounded shadow hover:bg-blue-100">📖 View Quiz History</a>
+     
 
-  <section>
-    <h2>Bulk Upload <span style="font-size:13px;color:#ffe175;">(overwrites quiz!)</span></h2>
-    <label for="categoryInput">Category Name</label>
-    <input id="categoryInput" type="text" placeholder="e.g. naruto" />
 
-    <label for="quizInput">Quiz ID (unique, e.g. naruto_quiz1)</label>
-    <input id="quizInput" type="text" placeholder="e.g. naruto_quiz1" />
+<!-- Manual XP -->
+<div class="bg-w p-4 rounded-xl shadow-xl">
+  <h2 class="text-xl font-semibold mb-2">🏅 Award/Remove XP</h2>
+  <input id="xp-user-id" class="w-full p-2 rounded border mb-2" placeholder="User UID">
+  <input id="xp-amount" class="w-full p-2 rounded border mb-2" placeholder="XP (+/-)">
+  <button onclick="updateXP()" class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">Update XP</button>
+</div>
 
-    <label for="jsonInput">Quiz Data JSON</label>
-    <textarea id="jsonInput" placeholder='{"name":"Naruto Quiz 1","questions":[{"q":"Who is Naruto&apos;s teacher?","options":["Kakashi","Iruka","Sasuke","Jiraiya"],"answer":"Kakashi"}]}'></textarea>
+<!-- Reset Leaderboard -->
+<div class="bg-white text-black p-4 rounded-xl shadow-xl">
+  <h2 class="text-xl font-semibold mb-2">🔄 Reset Leaderboard</h2>
+  <button onclick="resetLeaderboard()" class="bg-red-700 text-white px-4 py-2 rounded hover:bg-red-800">Reset All XP</button>
+</div>
 
-    <button id="uploadBtn">Set/Overwrite Quiz</button>
-  </section>
+  </div>  <div class="max-w-5xl mx-auto mt-10 bg-white text-black p-4 rounded-xl shadow-xl">
+    <h2 class="text-xl font-semibold mb-4">📝 Edit/Delete Quiz Questions</h2>
+    <input id="quiz-id" class="w-full p-2 rounded border mb-2" placeholder="Enter Quiz ID (e.g. Science_Chapter1_Quiz1)" />
+    <button onclick="loadQuiz()" class="bg-yellow-600 text-white px-4 py-2 rounded mb-4 hover:bg-yellow-700">Load Quiz</button><textarea id="quiz-data" class="w-full p-2 rounded border h-60 mb-4" placeholder='Quiz data will appear here after loading...'></textarea>
+<div class="flex gap-4">
+  <button onclick="updateQuiz()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Save Changes</button>
+  <button onclick="deleteQuiz()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete Quiz</button>
+</div>
 
-  <section>
-    <h2>All Quizzes</h2>
-    <table id="quizzesTable">
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th>Quiz ID</th>
-          <th>Name</th>
-          <th>Qns</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <div id="editArea" class="edit-area" style="display:none;"></div>
-  </section>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-    import {
-      getFirestore, collection, doc, getDocs, setDoc, deleteDoc, getDoc, updateDoc
-    } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+  </div>  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyCw5PitKPzzRBWdlZiI-Csm-N3av_9lIqQ",
-      authDomain: "anime001-d6669.firebaseapp.com",
-      projectId: "anime001-d6669",
-      storageBucket: "anime001-d6669.appspot.com",
-      messagingSenderId: "1005431495919",
-      appId: "1:1005431495919:web:dfbf43ba8a2a8ae5db4f1a"
+      apiKey: "AIzaSyDci6GAa0SPYWvpQa6s0ywkN4pLpcckSO0",
+      authDomain: "edutech002-e674b.firebaseapp.com",
+      projectId: "edutech002-e674b",
+      storageBucket: "edutech002-e674b.firebasestorage.app",
+      messagingSenderId: "634874984437",
+      appId: "1:634874984437:web:8e2082e99d0bfa1061d2bc"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Bulk upload/set
-    const categoryInput = document.getElementById('categoryInput');
-    const quizInput = document.getElementById('quizInput');
-    const jsonInput = document.getElementById('jsonInput');
-    const uploadBtn = document.getElementById('uploadBtn');
-    const statusMsg = document.getElementById('statusMsg');
-    const quizzesTableBody = document.querySelector("#quizzesTable tbody");
-    const editArea = document.getElementById('editArea');
+    const userList = document.getElementById("user-list");
+    const searchUser = document.getElementById("search-user");
 
-    function showStatus(msg, error = false) {
-      statusMsg.textContent = msg;
-      statusMsg.style.color = error ? "tomato" : "limegreen";
-      setTimeout(() => (statusMsg.textContent = ""), 3600);
+    async function loadUsers() {
+      const users = await getDocs(collection(db, "users"));
+      userList.innerHTML = "";
+      users.forEach(doc => {
+        const data = doc.data();
+        const li = document.createElement("li");
+        li.className = "p-2 bg-gray-100 rounded flex justify-between items-center";
+        li.innerHTML = `
+          <span><b>${data.name || "No Name"}</b> (${data.role || "student"}) — XP: ${data.xp || 0}</span>
+          <button class='bg-red-500 px-2 py-1 text-sm rounded text-white' onclick="blockUser('${doc.id}')">Block</button>
+        `;
+        userList.appendChild(li);
+      });
     }
 
-    uploadBtn.onclick = async () => {
-      const category = categoryInput.value.trim().toLowerCase();
-      const quizId = quizInput.value.trim();
-      const json = jsonInput.value.trim();
-      if (!category) return showStatus("Enter category", true);
-      if (!quizId) return showStatus("Enter quiz ID", true);
-      if (!json) return showStatus("Paste quiz data JSON", true);
-      let data;
+    searchUser.addEventListener("input", () => {
+      const search = searchUser.value.toLowerCase();
+      const items = userList.querySelectorAll("li");
+      items.forEach(li => {
+        li.style.display = li.textContent.toLowerCase().includes(search) ? "block" : "none";
+      });
+    });
+
+    window.blockUser = async (uid) => {
+      await updateDoc(doc(db, "users", uid), { role: "blocked" });
+      alert("User blocked!");
+      loadUsers();
+    }
+
+    window.sendBroadcast = async () => {
+      const msg = document.getElementById("broadcast-msg").value;
+      if (!msg) return alert("Message empty");
+      await setDoc(doc(db, "announcements", new Date().toISOString()), {
+        msg,
+        createdAt: new Date().toISOString()
+      });
+      alert("Message sent to all users");
+    }
+
+    window.updateXP = async () => {
+      const uid = document.getElementById("xp-user-id").value;
+      const amount = parseInt(document.getElementById("xp-amount").value);
+      if (!uid || isNaN(amount)) return alert("Invalid data");
+      const ref = doc(db, "users", uid);
+      const snap = await getDoc(ref);
+      const currentXP = snap.data()?.xp || 0;
+      await updateDoc(ref, { xp: currentXP + amount });
+      alert("XP updated");
+    }
+
+    window.resetLeaderboard = async () => {
+      if (!confirm("Are you sure? This will reset ALL users' XP.")) return;
+      const users = await getDocs(collection(db, "users"));
+      users.forEach(async user => {
+        await updateDoc(doc(db, "users", user.id), { xp: 0 });
+      });
+      alert("Leaderboard reset done.");
+      loadUsers();
+    }
+
+    window.loadQuiz = async () => {
+      const quizId = document.getElementById("quiz-id").value.trim();
+      if (!quizId) return alert("Enter quiz ID.");
+      const ref = doc(db, "questions", quizId);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) return alert("Quiz not found.");
+      document.getElementById("quiz-data").value = JSON.stringify(snap.data().questions, null, 2);
+    }
+
+    window.updateQuiz = async () => {
+      const quizId = document.getElementById("quiz-id").value.trim();
+      let updated;
       try {
-        data = JSON.parse(json);
+        updated = JSON.parse(document.getElementById("quiz-data").value);
+        if (!Array.isArray(updated)) throw new Error();
       } catch {
-        return showStatus("Invalid JSON format", true);
+        return alert("Invalid JSON format");
       }
-      if (!data || !Array.isArray(data.questions)) {
-        return showStatus("JSON must have a questions array!", true);
-      }
-      try {
-        await setDoc(doc(db, "quizzes", category, quizId), data);
-        showStatus("Quiz set/updated!");
-        jsonInput.value = "";
-        loadQuizzes();
-      } catch {
-        showStatus("Failed to save quiz", true);
-      }
-    };
-
-    async function loadQuizzes() {
-      quizzesTableBody.innerHTML = "";
-      const quizCatsSnap = await getDocs(collection(db,"quizzes"));
-      for (const catDoc of quizCatsSnap.docs) {
-        const cat = catDoc.id;
-        const quizzesSnap = await getDocs(collection(db,"quizzes",cat));
-        quizzesSnap.forEach(qdoc => {
-          const qdata = qdoc.data();
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${cat}</td>
-            <td>${qdoc.id}</td>
-            <td>${qdata.name || ''}</td>
-            <td>${Array.isArray(qdata.questions) ? qdata.questions.length : 0}</td>
-            <td>
-              <button class="btn-small btn-edit">Edit</button>
-              <button class="btn-small btn-delete">Delete</button>
-            </td>
-          `;
-          // Actions
-          const editBtn = tr.querySelector('.btn-edit');
-          const deleteBtn = tr.querySelector('.btn-delete');
-          editBtn.onclick = () => openEdit(cat, qdoc.id, qdata);
-          deleteBtn.onclick = async () => {
-            if (confirm(`Delete quiz ${qdoc.id} in ${cat}? This cannot be undone.`)) {
-              await deleteDoc(doc(db,"quizzes",cat,qdoc.id));
-              showStatus("Quiz deleted");
-              loadQuizzes();
-            }
-          };
-          quizzesTableBody.appendChild(tr);
-        });
-      }
+      await updateDoc(doc(db, "questions", quizId), { questions: updated });
+      alert("Quiz updated successfully.");
     }
 
-    // Edit quiz data inline
-    function openEdit(category, quizId, qdata) {
-      editArea.style.display = "block";
-      editArea.innerHTML = `
-        <strong>Edit Quiz: ${quizId} (${category})</strong><br>
-        <label>Quiz Name</label>
-        <input type="text" id="editQuizName" value="${qdata.name || ''}"/><br>
-        <label>Questions JSON</label>
-        <textarea id="editQuizQuestions">${JSON.stringify(qdata.questions || [], null, 2)}</textarea><br>
-        <button id="saveEditBtn">Save Changes</button>
-        <button onclick="this.parentNode.style.display='none'">Cancel</button>
-      `;
-      document.getElementById('saveEditBtn').onclick = async () => {
-        const name = document.getElementById('editQuizName').value.trim();
-        let questions;
-        try { questions = JSON.parse(document.getElementById('editQuizQuestions').value); }
-        catch { showStatus("Invalid questions JSON", true); return; }
-        if (!Array.isArray(questions)) { showStatus("Questions must be an array", true); return; }
-        await setDoc(doc(db,"quizzes",category,quizId), {name, questions});
-        editArea.style.display = "none";
-        showStatus("Quiz updated!");
-        loadQuizzes();
-      };
+    window.deleteQuiz = async () => {
+      const quizId = document.getElementById("quiz-id").value.trim();
+      if (!quizId) return alert("Enter quiz ID");
+      if (!confirm("Delete this quiz permanently?")) return;
+      await deleteDoc(doc(db, "questions", quizId));
+      alert("Quiz deleted");
+      document.getElementById("quiz-id").value = "";
+      document.getElementById("quiz-data").value = "";
     }
-    window.openEdit = openEdit;
 
-    // Load quizzes on page open
-    loadQuizzes();
-  </script>
-</body>
+    loadUsers();
+  </script></body>
   </html>
-    
